@@ -1,163 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Playground</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <h1>API Playground</h1>
-
-    <div class="container">
-      <div class="left-panel">
-        <!-- API Key Input -->
-        <div>
-          <label for="apiKey">API Key:</label>
-          <input
-            type="password"
-            id="apiKey"
-            value="lol key goes here lol key goes here "
-          />
-        </div>
-
-        <!-- Model Selection -->
-        <div>
-          <label for="model">Model:</label>
-          <select id="model">
-            <option value="gpt-4o" selected>gpt-4o</option>
-            <option value="gpt-3.5-turbo-instruct">
-              gpt-3.5-turbo-instruct
-            </option>
-            <option value="gpt-4o-mini-2024-07-18">
-              gpt-4o-mini-2024-07-18
-            </option>
-            <option value="gpt-4o-mini-2024-08-06">
-              gpt-4o-mini-2024-08-06
-            </option>
-            <option value="gpt-4o-2024-05-13">gpt-4o-2024-05-13</option>
-            <option value="gpt-4o-2024-08-06">gpt-4o-2024-08-06</option>
-            <option value="gpt-4-vision-preview">gpt-4-vision-preview</option>
-            <option value="gpt-4-turbo-preview">gpt-4-turbo-preview</option>
-            <option value="gpt-4-turbo-2024-04-09">
-              gpt-4-turbo-2024-04-09
-            </option>
-            <option value="gpt-4-1106-preview">gpt-4-1106-preview</option>
-            <option value="gpt-4-0613">gpt-4-0613</option>
-            <option value="gpt-4-0125-preview">gpt-4-0125-preview</option>
-            <option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</option>
-            <option value="gpt-3.5-turbo-1106">gpt-3.5-turbo-1106</option>
-            <option value="gpt-3.5-turbo-0125">gpt-3.5-turbo-0125</option>
-          </select>
-        </div>
-
-        <!-- Temperature Slider -->
-        <div class="slider-container">
-          <label for="temperature">Temperature:</label>
-          <input
-            type="range"
-            id="temperature"
-            min="0"
-            max="2"
-            step="0.01"
-            value="1"
-          />
-          <span id="temperatureValue">1.00</span>
-        </div>
-
-        <!-- Max Tokens Input -->
-        <div>
-          <label for="maxTokens">Maximum length:</label>
-          <input type="number" id="maxTokens" value="256" />
-        </div>
-
-        <!-- Top P Slider -->
-        <div class="slider-container">
-          <label for="topP">Top P:</label>
-          <input type="range" id="topP" min="0" max="2" step="0.01" value="1" />
-          <span id="topPValue">1.00</span>
-        </div>
-
-        <!-- Frequency Penalty -->
-        <div class="slider-container">
-          <label for="frequencyPenalty">Frequency penalty:</label>
-          <input
-            type="range"
-            id="frequencyPenalty"
-            min="0"
-            max="2"
-            step="0.01"
-            value="1.00"
-          />
-          <span id="frequencyPenaltyValue">1.00</span>
-        </div>
-
-        <!-- Presence Penalty -->
-        <div class="slider-container">
-          <label for="presencePenalty">Presence penalty:</label>
-          <input
-            type="range"
-            id="presencePenalty"
-            min="0"
-            max="2"
-            step="0.01"
-            value="1.00"
-          />
-          <span id="presencePenaltyValue">1.00</span>
-        </div>
-
-        <!-- Response Format -->
-        <div>
-          <label for="responseFormat">Response Format:</label>
-          <select id="responseFormat">
-            <option value="text">Text</option>
-            <option value="images">Images</option>
-            <option value="voice">Voice</option>
-          </select>
-        </div>
-
-        <!-- Memory Option -->
-        <div>
-          <label for="memoryCheckbox">Give this model memory:</label>
-          <input type="checkbox" id="memoryCheckbox" />
-          <label for="memoryLength">Remember the last</label>
-          <input
-            type="number"
-            id="memoryLength"
-            value="5"
-            min="1"
-            style="width: 60px"
-          />
-          messages
-        </div>
-
-        <!-- Chat History -->
-        <div class="right-panel">
-          <h2>Chat History</h2>
-          <div id="chatHistory"></div>
-        </div>
-
-        <!-- Input Text and Send Button -->
-        <div>
-          <label for="inputText">Prompt:</label>
-          <textarea id="inputText"></textarea>
-          <button id="sendBtn">Send Request</button>
-        </div>
-
-        <!-- Output Box -->
-        <div>
-          <label for="outputBox">Output:</label>
-          <textarea id="outputBox" readonly></textarea>
-        </div>
-
-        <!-- JSON Output -->
-        <div class="json-output">
-          <label for="jsonOutput">JSON Output:</label>
-          <textarea id="jsonOutput" readonly>{}</textarea>
-        </div>
-      </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Grid</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="number"] {
+            padding: 5px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 900px;
+        }
+        .photo-grid img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Photo Grid</h1>
+    <div class="input-group">
+        <label for="start">Start ID: </label>
+        <input type="number" id="start" min="1" required>
+        <label for="end">End ID: </label>
+        <input type="number" id="end" min="1" required>
+        <button onclick="loadPhotos()">Load Photos</button>
     </div>
+    <div class="photo-grid" id="photoGrid"></div>
 
-    <script src="./scripts.js"></script>
-  </body>
+    <script>
+        function loadPhotos() {
+            const startId = document.getElementById('start').value;
+            const endId = document.getElementById('end').value;
+            const photoGrid = document.getElementById('photoGrid');
+            photoGrid.innerHTML = ''; // Clear previous photos
+            
+            for (let i = startId; i <= endId; i++) {
+                const img = document.createElement('img');
+                img.src = `https://my.curatorlive.com/photos/YJ8WHM/${i}`;
+                photoGrid.appendChild(img);
+            }
+        }
+    </script>
+</body>
 </html>
