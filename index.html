@@ -15,7 +15,7 @@
             margin: 0;
             padding: 20px;
         }
-        .input-group, .button-group {
+        .input-group {
             margin-bottom: 20px;
             width: 100%;
             max-width: 600px;
@@ -23,7 +23,7 @@
             flex-direction: column;
             align-items: center;
         }
-        input[type="text"], input[type="number"] {
+        input[type="number"], input[type="text"] {
             padding: 10px;
             margin: 10px 0;
             font-size: 18px;
@@ -64,52 +64,38 @@
 <body>
     <h1>Photo Grid</h1>
     <div class="input-group">
-        <label for="customIds">Enter custom IDs (comma-separated):</label>
-        <input type="text" id="customIds" placeholder="e.g. 8842421,8842422,8842423">
-        <label for="start">Start ID: </label>
-        <input type="number" id="start" min="1" value="8842421" required>
-        <label for="end">End ID: </label>
-        <input type="number" id="end" min="1" value="8842430" required>
+        <label for="customIds">Enter Custom IDs (comma separated): </label>
+        <input type="text" id="customIds" placeholder="Example: 8842421,8842422,8842425">
         <button onclick="loadPhotos()">Load Photos</button>
     </div>
-    <div class="button-group">
-        <button onclick="copyToClipboard()">Copy Successful IDs as CSV</button>
-        <button>sh</button>
-    </div>
     <div class="photo-grid" id="photoGrid"></div>
+    <button id="copyButton" onclick="copySuccessfulIds()">Copy Successful IDs as CSV</button>
 
     <script>
         let successfulIds = [];
 
         function loadPhotos() {
-            const customIds = document.getElementById('customIds').value.split(',').map(id => id.trim()).filter(id => id !== "");
-            const startId = document.getElementById('start').value;
-            const endId = document.getElementById('end').value;
+            const customIds = document.getElementById('customIds').value.split(',');
             const photoGrid = document.getElementById('photoGrid');
             photoGrid.innerHTML = ''; // Clear previous photos
             successfulIds = []; // Reset successful IDs
-
-            let ids = customIds.length > 0 ? customIds : Array.from({length: endId - startId + 1}, (_, i) => parseInt(startId) + i);
-
-            let failedImages = [];
-
-            ids.forEach(id => {
+            
+            customIds.forEach((id) => {
                 const img = document.createElement('img');
-                img.src = `https://my.curatorlive.com/photos/YJ8WHM/${id}`;
-                img.onload = () => {
-                    successfulIds.push(id);
+                img.src = `https://my.curatorlive.com/photos/YJ8WHM/${id.trim()}`;
+                img.onerror = function() {
+                    // Move failed images to the end
                     photoGrid.appendChild(img);
                 };
-                img.onerror = () => {
-                    failedImages.push(img);
+                img.onload = function() {
+                    // Track successful IDs
+                    successfulIds.push(id.trim());
                 };
+                photoGrid.appendChild(img);
             });
-
-            // After all images are processed, append failed images to the bottom
-            failedImages.forEach(img => photoGrid.appendChild(img));
         }
 
-        function copyToClipboard() {
+        function copySuccessfulIds() {
             const csv = successfulIds.join(',');
             const textarea = document.createElement('textarea');
             textarea.value = csv;
@@ -117,11 +103,14 @@
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            alert('Copied successful IDs as CSV!');
+            alert('Successful IDs copied as CSV!');
         }
 
         // Load default photos on page load
-        window.onload = loadPhotos;
+        window.onload = function() {
+            document.getElementById('customIds').value = "8842421,8842422,8842423,8842424,8842425,8842426,8842427,8842428,8842429,8842430";
+            loadPhotos();
+        };
     </script>
 </body>
 </html>
