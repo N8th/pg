@@ -15,7 +15,7 @@
             margin: 0;
             padding: 20px;
         }
-        .input-group {
+        .input-group, .button-group {
             margin-bottom: 20px;
             width: 100%;
             max-width: 600px;
@@ -23,7 +23,7 @@
             flex-direction: column;
             align-items: center;
         }
-        input[type="number"] {
+        input[type="text"], input[type="number"] {
             padding: 10px;
             margin: 10px 0;
             font-size: 18px;
@@ -64,26 +64,60 @@
 <body>
     <h1>Photo Grid</h1>
     <div class="input-group">
+        <label for="customIds">Enter custom IDs (comma-separated):</label>
+        <input type="text" id="customIds" placeholder="e.g. 8842421,8842422,8842423">
         <label for="start">Start ID: </label>
         <input type="number" id="start" min="1" value="8842421" required>
         <label for="end">End ID: </label>
         <input type="number" id="end" min="1" value="8842430" required>
         <button onclick="loadPhotos()">Load Photos</button>
     </div>
+    <div class="button-group">
+        <button onclick="copyToClipboard()">Copy Successful IDs as CSV</button>
+        <button>sh</button>
+    </div>
     <div class="photo-grid" id="photoGrid"></div>
 
     <script>
+        let successfulIds = [];
+
         function loadPhotos() {
+            const customIds = document.getElementById('customIds').value.split(',').map(id => id.trim()).filter(id => id !== "");
             const startId = document.getElementById('start').value;
             const endId = document.getElementById('end').value;
             const photoGrid = document.getElementById('photoGrid');
             photoGrid.innerHTML = ''; // Clear previous photos
-            
-            for (let i = startId; i <= endId; i++) {
+            successfulIds = []; // Reset successful IDs
+
+            let ids = customIds.length > 0 ? customIds : Array.from({length: endId - startId + 1}, (_, i) => parseInt(startId) + i);
+
+            let failedImages = [];
+
+            ids.forEach(id => {
                 const img = document.createElement('img');
-                img.src = `https://my.curatorlive.com/photos/YJ8WHM/${i}`;
-                photoGrid.appendChild(img);
-            }
+                img.src = `https://my.curatorlive.com/photos/YJ8WHM/${id}`;
+                img.onload = () => {
+                    successfulIds.push(id);
+                    photoGrid.appendChild(img);
+                };
+                img.onerror = () => {
+                    failedImages.push(img);
+                };
+            });
+
+            // After all images are processed, append failed images to the bottom
+            failedImages.forEach(img => photoGrid.appendChild(img));
+        }
+
+        function copyToClipboard() {
+            const csv = successfulIds.join(',');
+            const textarea = document.createElement('textarea');
+            textarea.value = csv;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Copied successful IDs as CSV!');
         }
 
         // Load default photos on page load
