@@ -64,9 +64,16 @@
 <body>
     <h1>Photo Grid</h1>
     <div class="input-group">
+        <label for="start">Start ID: </label>
+        <input type="number" id="start" min="1" value="8842421" required>
+        <label for="end">End ID: </label>
+        <input type="number" id="end" min="1" value="8842430" required>
+        <button onclick="loadPhotosByRange()">Load Photos by Range</button>
+    </div>
+    <div class="input-group">
         <label for="customIds">Enter Custom IDs (comma separated): </label>
         <input type="text" id="customIds" placeholder="Example: 8842421,8842422,8842425">
-        <button onclick="loadPhotos()">Load Photos</button>
+        <button onclick="loadPhotosByCustomIds()">Load Photos by Custom IDs</button>
     </div>
     <div class="photo-grid" id="photoGrid"></div>
     <button id="copyButton" onclick="copySuccessfulIds()">Copy Successful IDs as CSV</button>
@@ -74,22 +81,36 @@
     <script>
         let successfulIds = [];
 
-        function loadPhotos() {
-            const customIds = document.getElementById('customIds').value.split(',');
+        function loadPhotosByRange() {
+            const startId = document.getElementById('start').value;
+            const endId = document.getElementById('end').value;
+            const ids = [];
+            for (let i = startId; i <= endId; i++) {
+                ids.push(i);
+            }
+            loadPhotos(ids);
+        }
+
+        function loadPhotosByCustomIds() {
+            const customIds = document.getElementById('customIds').value.split(',').map(id => id.trim());
+            loadPhotos(customIds);
+        }
+
+        function loadPhotos(ids) {
             const photoGrid = document.getElementById('photoGrid');
             photoGrid.innerHTML = ''; // Clear previous photos
             successfulIds = []; // Reset successful IDs
             
-            customIds.forEach((id) => {
+            ids.forEach((id) => {
                 const img = document.createElement('img');
-                img.src = `https://my.curatorlive.com/photos/YJ8WHM/${id.trim()}`;
+                img.src = `https://my.curatorlive.com/photos/YJ8WHM/${id}`;
                 img.onerror = function() {
                     // Move failed images to the end
                     photoGrid.appendChild(img);
                 };
                 img.onload = function() {
                     // Track successful IDs
-                    successfulIds.push(id.trim());
+                    successfulIds.push(id);
                 };
                 photoGrid.appendChild(img);
             });
@@ -108,8 +129,7 @@
 
         // Load default photos on page load
         window.onload = function() {
-            document.getElementById('customIds').value = "8842421,8842422,8842423,8842424,8842425,8842426,8842427,8842428,8842429,8842430";
-            loadPhotos();
+            loadPhotosByRange();
         };
     </script>
 </body>
