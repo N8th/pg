@@ -59,6 +59,15 @@
             border-radius: 10px;
             border: 2px solid #444;
         }
+        .results {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .results div {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -76,10 +85,22 @@
         <button onclick="loadPhotosByCustomIds()">Load Photos by Custom IDs</button>
     </div>
     <div class="photo-grid" id="photoGrid"></div>
+
+    <div class="results">
+        <div id="successfulDiv">
+            <strong>Successful IDs (<span id="successCount">0</span>):</strong>
+            <p id="successfulIds"></p>
+        </div>
+        <div id="unsuccessfulDiv">
+            <strong>Unsuccessful IDs (<span id="failCount">0</span>):</strong>
+            <p id="unsuccessfulIds"></p>
+        </div>
+    </div>
     <button id="copyButton" onclick="copySuccessfulIds()">Copy Successful IDs as CSV</button>
 
     <script>
         let successfulIds = [];
+        let unsuccessfulIds = [];
 
         function loadPhotosByRange() {
             const startId = document.getElementById('start').value;
@@ -100,20 +121,32 @@
             const photoGrid = document.getElementById('photoGrid');
             photoGrid.innerHTML = ''; // Clear previous photos
             successfulIds = []; // Reset successful IDs
+            unsuccessfulIds = []; // Reset unsuccessful IDs
+            updateResults(); // Reset counters and text
             
             ids.forEach((id) => {
                 const img = document.createElement('img');
                 img.src = `https://my.curatorlive.com/photos/YJ8WHM/${id}`;
                 img.onerror = function() {
                     // Move failed images to the end
+                    unsuccessfulIds.push(id);
+                    updateResults();
                     photoGrid.appendChild(img);
                 };
                 img.onload = function() {
                     // Track successful IDs
                     successfulIds.push(id);
+                    updateResults();
                 };
                 photoGrid.appendChild(img);
             });
+        }
+
+        function updateResults() {
+            document.getElementById('successfulIds').textContent = successfulIds.join(',');
+            document.getElementById('unsuccessfulIds').textContent = unsuccessfulIds.join(',');
+            document.getElementById('successCount').textContent = successfulIds.length;
+            document.getElementById('failCount').textContent = unsuccessfulIds.length;
         }
 
         function copySuccessfulIds() {
