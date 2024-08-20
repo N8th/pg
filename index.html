@@ -68,6 +68,11 @@
         .results div {
             margin-bottom: 10px;
         }
+        .checkbox-group {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +82,10 @@
         <input type="number" id="start" min="1" value="8842421" required>
         <label for="end">End ID: </label>
         <input type="number" id="end" min="1" value="8842430" required>
+        <div class="checkbox-group">
+            <input type="checkbox" id="delayLoad">
+            <label for="delayLoad">Delay Load (10 at a time)</label>
+        </div>
         <button onclick="loadPhotosByRange()">Load Photos by Range</button>
     </div>
     <div class="input-group">
@@ -101,6 +110,7 @@
     <script>
         let successfulIds = [];
         let unsuccessfulIds = [];
+        let remainingIds = [];
 
         function loadPhotosByRange() {
             const startId = document.getElementById('start').value;
@@ -118,27 +128,38 @@
         }
 
         function loadPhotos(ids) {
-            const photoGrid = document.getElementById('photoGrid');
-            photoGrid.innerHTML = ''; // Clear previous photos
-            successfulIds = []; // Reset successful IDs
-            unsuccessfulIds = []; // Reset unsuccessful IDs
+            remainingIds = ids;
+            successfulIds = [];
+            unsuccessfulIds = [];
+            document.getElementById('photoGrid').innerHTML = ''; // Clear previous photos
             updateResults(); // Reset counters and text
-            
-            ids.forEach((id) => {
+            processNextBatch();
+        }
+
+        function processNextBatch() {
+            const delayLoad = document.getElementById('delayLoad').checked;
+            const batchSize = delayLoad ? 10 : remainingIds.length;
+
+            const batchIds = remainingIds.splice(0, batchSize);
+            batchIds.forEach((id) => {
                 const img = document.createElement('img');
                 img.src = `https://my.curatorlive.com/photos/YJ8WHM/${id}`;
                 img.onerror = function() {
-                    // Move failed images to the end
                     unsuccessfulIds.push(id);
                     updateResults();
-                    photoGrid.appendChild(img);
+                    document.getElementById('photoGrid').appendChild(img);
+                    if (batchSize === 10 && (successfulIds.length + unsuccessfulIds.length) % 10 === 0) {
+                        processNextBatch();
+                    }
                 };
                 img.onload = function() {
-                    // Track successful IDs
                     successfulIds.push(id);
                     updateResults();
+                    if (batchSize === 10 && (successfulIds.length + unsuccessfulIds.length) % 10 === 0) {
+                        processNextBatch();
+                    }
                 };
-                photoGrid.appendChild(img);
+                document.getElementById('photoGrid').appendChild(img);
             });
         }
 
@@ -159,11 +180,6 @@
             document.body.removeChild(textarea);
             alert('Successful IDs copied as CSV!');
         }
-
-        // Load default photos on page load
-        window.onload = function() {
-            loadPhotosByRange();
-        };
     </script>
 </body>
 </html>
